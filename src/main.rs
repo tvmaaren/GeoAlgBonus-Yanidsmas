@@ -5,6 +5,7 @@ use crate::plot::plot::plot;
 
 use std::fs::File;
 use std::io::{self, BufRead};
+use std::env;
 
 fn parse_float_tuples_from_file(file_path: &str) -> Result<Vec<(f64, f64)>, Box<dyn std::error::Error>> {
     // Open the file for reading
@@ -40,11 +41,21 @@ fn parse_tuple(line: &str) -> Option<(f64, f64)> {
     None
 }
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-  let file_path = "tests/test2";
-  let points = parse_float_tuples_from_file(file_path)?;
-  //TODO: remove clone
-  let convex_hull = graham_scan(points.clone());
-  //TODO: Handle errors
-  plot(points.clone(),convex_hull)?;
-  Ok(())
+    let args: Vec<String> = env::args().collect();
+    //TODO: make it possible to run more test cases at once
+    if args.len()!=3 {
+        panic!("Expected 2 arguments");
+    }
+    let file_path = &args[2];
+    let points = parse_float_tuples_from_file(&file_path)?;
+    let algorithm_name = &args[1];
+    let algorithm = match algorithm_name.as_str() {
+                          "graham_scan" => graham_scan,
+                          &_ => todo!()
+                    };
+    //TODO: remove clone
+    let convex_hull = algorithm(points.clone());
+    //TODO: Handle errors
+    plot(points.clone(),convex_hull)?;
+    Ok(())
 }
