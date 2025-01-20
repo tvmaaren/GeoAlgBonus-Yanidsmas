@@ -1,1 +1,0 @@
-/home/Thomas/Documents/GeoAlg/bonus/GeoAlgBonus-Thoidsann/target/debug/convexhull: /home/Thomas/Documents/GeoAlg/bonus/GeoAlgBonus-Thoidsann/src/graham_scan.rs /home/Thomas/Documents/GeoAlg/bonus/GeoAlgBonus-Thoidsann/src/main.rs /home/Thomas/Documents/GeoAlg/bonus/GeoAlgBonus-Thoidsann/src/plot.rs
