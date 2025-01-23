@@ -1,0 +1,50 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{parskip}
+
+\hypersetup{
+	colorlinks=true,
+	urlcolor=blue
+}
+\newcommand{\todo}[1]{\textbf{\textcolor{red}{Todo: #1}}}
+
+
+\title{Reporting on \href{https://github.com/tvmaaren/GeoAlgBonus-Yanidsmas}{Yanidsmas}.}
+\author{Yanna \todo{surname} (\todo{student number}), Ids de Vlas (\todo{student number}), Thomas van Maaren (9825827)}
+
+
+\begin{document}
+
+\maketitle
+
+In this report we will discuss the programme Yanidsmas. This is a programme that can
+given any set of points in the plane, calculate the vertices of it's convex hull. The
+user has to choose between four algorithms: Graham Scan, Jarvis March, Divide
+and Conquer and Chan's Algorithm. The programme can be cloned be from our
+\href{https://github.com/tvmaaren/GeoAlgBonus-Yanidsmas}{git repository}.
+
+\section*{Language and Environment}
+
+We have decided to use Rust to write Yanidsmas. This is because we wanted an imperative
+language that gives a very low chance of runtime errors or unpredictable behaviour.
+Our git repository contains a \href{https://github.com/tvmaaren/GeoAlgBonus-Yanidsmas/tree/main/tests}{tests} directory that contains all the test cases we came up with.
+When you run the program on a testcase it will output a png image. This image shows
+a scatter plot of the points in the test case where every vertex of the Convex hull is
+marked red. We did this to make it possible to see at a glance if the programme gives
+the right output. When benchmarking the scatter plot is disabled as the
+time this takes is not relevant to measure the speed of our algorithms. For a more
+detailed explanation on how to use Yanidsmas we refer to README.md file in our git repository.
+
+\section*{Correctness of the algorithms}
+
+
+
+\section*{Test cases}
+
+\section*{Results}
+
+\section*{Conclusion}
+
+\end{document}
