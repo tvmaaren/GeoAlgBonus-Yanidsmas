@@ -1,3 +1,7 @@
+% Conventions:
+% 	- Use italics when refering to variable or function names in our code
+%	- For todo's we use the todo comand
+
 \documentclass{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{xcolor}
@@ -11,7 +15,8 @@
 \newcommand{\todo}[1]{\textbf{\textcolor{red}{Todo: #1}}}
 
 
-\title{Reporting on \href{https://github.com/tvmaaren/GeoAlgBonus-Yanidsmas}{Yanidsmas}.}
+
+\title{Report on \href{https://github.com/tvmaaren/GeoAlgBonus-Yanidsmas}{Yanidsmas}}
 \author{Yanna \todo{surname} (\todo{student number}), Ids de Vlas (\todo{student number}), Thomas van Maaren (9825827)}
 
 
@@ -29,6 +34,7 @@ and Conquer and Chan's Algorithm. The programme can be cloned be from our
 
 We have decided to use Rust to write Yanidsmas. This is because we wanted an imperative
 language that gives a very low chance of runtime errors or unpredictable behaviour.
+We recommend to use cargo to run our programme.
 Our git repository contains a \href{https://github.com/tvmaaren/GeoAlgBonus-Yanidsmas/tree/main/tests}{tests} directory that contains all the test cases we came up with.
 When you run the program on a testcase it will output a png image. This image shows
 a scatter plot of the points in the test case where every vertex of the Convex hull is
@@ -39,7 +45,47 @@ detailed explanation on how to use Yanidsmas we refer to README.md file in our g
 
 \section*{Correctness of the algorithms}
 
+For every implemented algorithm we will give a short explanation to why it is correct in
+all cases.
 
+\subsection*{Graham Scan}
+
+The algorithm is split into two parts. First it computes the top half of the
+convex and then the bottem half. The function \textit{convex_hull_vside}
+computes the given vertical side (top or bottem) of the convex hull. For the
+function \textit{convex_hull_vside} to work properly, it is necessary that
+the points are sorted lexographicly in ascending order. The function
+\textit{convex_hull_vside} has a loop that goes through all of the points. We
+will show that this loop has the invariant that \textit{convex_hull} is the set
+of vertices of the given vertical side of the convex hull of the set of points the
+loop has passed. From now on we will call ``the set of vertices of the given vertical side of the convex hull of the set of points the 
+loop has passed" the intermediate set. At the end of the loop it has passed through all of the points,
+hence it returns the given vertical side of the vertices of the convex hull.
+
+We will now show that the invariant is correct. We know that if there are only two
+points or less points, that all the points are vertices of the convex hull, hence
+we can add them inmediately to the intermediate set. We know that the new point has to be the point with
+the maximum $x$ postion of all points seen so far. 
+This implies that the point must be in the intermediate set. We know that a point is not part of the top vertices
+of the convex hull if and only if it is below a line or on a line segment going through two other points. Because our invariant
+tells us that the previous intermediate set is correct, we only have to check line segments with the new point as an endpoint.
+Let $r$ be the new point and $p,q$ be previous two points in the intermediate set. If the line $pr$ goes through or over $q$
+we now tat $q$ cannot be in the intermediate convex hull, hence it is removed.
+Now look at the case that $pr$ goes under $q$. We now that all remaining points
+in the intermediate
+set have a x position smaller or equal than that of $p$ and $q$. We now that $q$ lies below above segment $pr$ so the set
+of points that have an $x$ position smaller or equal to $p$ and are below the line $pr$ is a subset of the points
+with a $x$ position smaller or equal to $p$ that lie below the line $pq$. Because of the invariant we know that all other
+points in the intermediate set lies below $pr$, so they must also lie below $pq$, hence all other points remain in the
+intermediate set.
+
+\todo{Frank Staals said: ``You will likely run in to an additional issue that, in the theory part of the course, we mostly ignore. See for example what happens when all input points are almost on a line. Think about a way to avoid this issue, and state in your paper what you did to tackle it." I have not found this issue yet.}
+
+
+
+\subsection*{Jarvis March}
+\subsection*{Divide and Conquer}
+\subsection*{Chan's Algorithm}
 
 \section*{Test cases}
 

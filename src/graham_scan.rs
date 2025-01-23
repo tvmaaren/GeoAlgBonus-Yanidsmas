@@ -44,7 +44,7 @@ fn convex_hull_vside (vside : VSide, sorted_points : &[(f64,f64)]) -> Vec<(f64,f
     return convex_hull;
 }
 
-//This function assumes that a and b are in the same order.
+//This function assumes that a and b have the same ordering.
 fn union_sorted<T: PartialOrd+Copy>(a:Vec<T>,b:Vec<T>) -> Vec<T>{
     let mut vec = Vec::new();
     let mut i = 0;
