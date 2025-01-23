@@ -1,4 +1,4 @@
-# GeoAlgBonus-Thoidsann
+# Yanidsmas
 
 This program takes a set of points as inputs and calculates the subset of points
 that are on the border of the convex hull. The user will be able to choose
