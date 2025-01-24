@@ -1,13 +1,17 @@
 mod graham_scan;
 use crate::graham_scan::graham_scan::graham_scan;
+mod divide_and_conquer;
+use crate::divide_and_conquer::divide_and_conquer;
 mod plot;
 use crate::plot::plot::plot;
 
+use std::env;
 use std::fs::File;
 use std::io::{self, BufRead};
-use std::env;
 
-fn parse_float_tuples_from_file(file_path: &str) -> Result<Vec<(f64, f64)>, Box<dyn std::error::Error>> {
+fn parse_float_tuples_from_file(
+    file_path: &str,
+) -> Result<Vec<(f64, f64)>, Box<dyn std::error::Error>> {
     // Open the file for reading
     let file = File::open(file_path)?;
     let reader = io::BufReader::new(file);
@@ -16,7 +20,7 @@ fn parse_float_tuples_from_file(file_path: &str) -> Result<Vec<(f64, f64)>, Box<
 
     for line in reader.lines() {
         let line = line?; // Handle potential I/O errors
-        // Parse the line as a tuple
+                          // Parse the line as a tuple
         if let Some((first, second)) = parse_tuple(&line) {
             result.push((first, second));
         } else {
@@ -43,19 +47,20 @@ fn parse_tuple(line: &str) -> Option<(f64, f64)> {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
     //TODO: make it possible to run more test cases at once
-    if args.len()!=3 {
+    if args.len() != 3 {
         panic!("Expected 2 arguments");
     }
     let file_path = &args[2];
     let points = parse_float_tuples_from_file(&file_path)?;
     let algorithm_name = &args[1];
     let algorithm = match algorithm_name.as_str() {
-                          "graham_scan" => graham_scan,
-                          &_ => todo!()
-                    };
+        "graham_scan" => graham_scan,
+        "divide_and_conquer" => divide_and_conquer,
+        &_ => todo!(),
+    };
     //TODO: remove clone
     let convex_hull = algorithm(points.clone());
     //TODO: Handle errors
-    plot(points.clone(),convex_hull)?;
+    plot(points.clone(), convex_hull)?;
     Ok(())
 }
