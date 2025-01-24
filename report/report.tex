@@ -17,7 +17,7 @@
 
 
 \title{Report on \href{https://github.com/tvmaaren/GeoAlgBonus-Yanidsmas}{Yanidsmas}}
-\author{Yanna \todo{surname} (\todo{student number}), Ids de Vlas (6967396), Thomas van Maaren (9825827)}
+\author{Yanna van Straten (\todo{7567596}), Ids de Vlas (6967396), Thomas van Maaren (9825827)}
 
 
 \begin{document}
@@ -89,6 +89,9 @@ If $l$ is the leftmost point, the algorithm will then find another point $p$ suc
 Then a next point is found to make a line with $p$. This continues until the point $l$ is found a second time, completing the algorithm and the convex hull.
 In the case of colinearity, the point is chosen that can make the longest edge.
 \\
+The algorithm is correct because it runs according to the definiton of a convex hull. 
+It will find all edges where all points are to one side of this edge, building on the foundation that the vertices of these edges are all incident to exactly two convex hull edges.
+\\
 This algorithm runs in $O(nh)$ time where $h$ is the amount of points in the convex hull. This makes the algorithm pretty fast when the point set is large but the convex hull is not.
 However if the convex hull has $O(n)$ vertices the algorithm will run in $O(n^2)$ time.
 
@@ -96,7 +99,9 @@ However if the convex hull has $O(n)$ vertices the algorithm will run in $O(n^2)
 The algorithm is a classic divide and conquer algorithm in the sense that the (lexographicly sorted) imput is split into 2 parts, both of those are once again split recursively until only single points are left.
 The algorithm then computes the convex hull of the single point sets, and recursively merges the sets maintaining a correct convex hull of the subset after every merge.
 The merging is done by first finding the upper and lower combined tangent of the two convex hulls to be merged.
-When considering the combined shape of the two convex hulls with the two tangents, any point on the interior of this shape is removed to create the combined convex hull.
+When considering the combined shape of the two convex hulls with the two tangents, any points on the interior of this shape are removed.
+Because only the points on the interior are removed, the remaining points create the convex hull of the combined sets.
+This inductive step, together with the base case of single point convex hulls, will create a complete convex hull in the end.
 \\
 Most of the logic is in finding the upper and lower tangents for the merging process.
 Let $A$ and $B$ be two convex polygons representing two subset convex hulls to be merged. Every point in $B$ is right of every point in $A$ due to the dividing of the points.
@@ -108,9 +113,9 @@ The same is done for $b$ except the walking is done clockwise.
 This procedure will find the upper combined tangent of $A$ and $B$. For the lower tangent the same is done but with the order of the polygons switched.
 Colinearity is handled by picking the longest possible line segment as the tangent.
 \\
-While this algorithm runs in $O(n\log n)$ time, it does generally run faster on sets with smaller convex hulls. 
-This is due to the fact that the merge operation is proportional to the convex hull of the merged subsets.
-However it is still possible for a particular set to have big convex hulls in the subsets but a small final hull, these sets would run relatively slowly.
+While this algorithm runs in $O(n\log n)$ time, it will not only take $O(n\log n)$ time for sorting the points, but also for running the algorithm itself.
+When comparing to graham scan, the other $O(n\log n)$ algorithm, divide and conquer will generally run a bit slower since graham scan will only take $O(n)$ time after sorting the points.
+
 \subsection*{Chan's Algorithm}
 
 \section*{Test cases}
