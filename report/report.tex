@@ -84,9 +84,17 @@ intermediate set.
 
 
 \subsection*{Jarvis March}
+The jarvis march algorithm starts with the leftmost point in the set, since it is known that this point has to be in the convex hull. 
+If $l$ is the leftmost point, the algorithm will then find another point $p$ such that $\overline{lp}$ is to the left of every other point in the set. 
+Then a next point is found to make a line with $p$. This continues until the point $l$ is found a second time, completing the algorithm and the convex hull.
+In the case of colinearity, the point is chosen that can make the longest edge.
+\\
+This algorithm runs in $O(nh)$ time where $h$ is the amount of points in the convex hull. This makes the algorithm pretty fast when the point set is large but the convex hull is not.
+However if the convex hull has $O(n)$ vertices the algorithm will run in $O(n^2)$ time.
+
 \subsection*{Divide and Conquer}
-The algorithm is a classic divide and conquer algorithm in the sense that the (sorted) imput is split into 2 parts, both of those are once again split recursively until only single points are left.
-The algorithm then computes the convex hull of the single point sets, and recursively merges the sets again maintaining a correct convex hull of the subset after every merge.
+The algorithm is a classic divide and conquer algorithm in the sense that the (lexographicly sorted) imput is split into 2 parts, both of those are once again split recursively until only single points are left.
+The algorithm then computes the convex hull of the single point sets, and recursively merges the sets maintaining a correct convex hull of the subset after every merge.
 The merging is done by first finding the upper and lower combined tangent of the two convex hulls to be merged.
 When considering the combined shape of the two convex hulls with the two tangents, any point on the interior of this shape is removed to create the combined convex hull.
 \\
@@ -95,13 +103,24 @@ Let $A$ and $B$ be two convex polygons representing two subset convex hulls to b
 The tangent is then found by starting at a vertex pair $a \in A$ and $b \in B$, where the initial $a$ is the rightmost point of $A$ and the initial $b$ the leftmost of $B$. 
 Then the candidate tangent $\overline{ab}$ is created.
 If both the neighbours of both $a$ and $b$ are to the right of $\overline{ab}$, this candidate is the tangent we were looking for. 
-If one of the neighbours of $a$ is on the wrong side, $a$ is updated to be the next vertex of $A$, repeating this process while walking around the polygon. 
-The same is done for $b$.
+If one of the neighbours of $a$ is on the wrong side, $a$ is updated to be the next vertex of $A$ in a counterclockwise fashion, repeating this process while walking around the polygon. 
+The same is done for $b$ except the walking is done clockwise.
+This procedure will find the upper combined tangent of $A$ and $B$. For the lower tangent the same is done but with the order of the polygons switched.
 Colinearity is handled by picking the longest possible line segment as the tangent.
+\\
+While this algorithm runs in $O(n\log n)$ time, it does generally run faster on sets with smaller convex hulls. 
+This is due to the fact that the merge operation is proportional to the convex hull of the merged subsets.
+However it is still possible for a particular set to have big convex hulls in the subsets but a small final hull, these sets would run relatively slowly.
 \subsection*{Chan's Algorithm}
 
 \section*{Test cases}
-
+We have created 3 testing sets, one for correctness and two for benchmarking.
+The correctness set has multiple degenerate cases, showing the algorithms ability to handle these cases.
+The benchmarking sets are created using two different point generation scripts on various numbers of points.
+The "random" set generates points arbitrarily in a unit disk. The assumption is that these points will have a relative small convex hull.
+The "cocircular" set generates points arbitrarily on a unit circle. Since all these points are cocircular they will all be part of the convex hull.
+\\
+The goal of these different benchmarking sets is to showcase the strengths and weaknesses of the various algorithms.
 \section*{Results}
 
 \section*{Conclusion}
