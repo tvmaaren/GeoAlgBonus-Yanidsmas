@@ -1,3 +1,6 @@
+
+mod chan;
+use crate::chan::chan;
 mod graham_scan;
 use crate::graham_scan::graham_scan;
 mod jarvis_march;
@@ -58,6 +61,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let algorithm = match algorithm_name.as_str() {
         "graham_scan" => graham_scan,
         "divide_and_conquer" => divide_and_conquer,
+        "chan" => chan,
         "jarvis_march" => jarvis_march,
         &_ => todo!(),
     };
@@ -67,3 +71,4 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     plot(points.clone(), convex_hull)?;
     Ok(())
 }
+
