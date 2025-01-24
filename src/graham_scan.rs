@@ -1,13 +1,12 @@
-pub mod graham_scan {
+use partial_min_max::{max, min};
+use std::cmp::Ordering::{Equal, Greater, Less};
 
-    use partial_min_max::{max, min};
-    use std::cmp::Ordering::{Equal, Greater, Less};
+#[derive(PartialEq, Copy, Clone)]
+enum VSide {
+    Top,
+    Bottem,
+}
 
-    #[derive(PartialEq, Copy, Clone)]
-    enum VSide {
-        Top,
-        Bottem,
-    }
 
 
 fn is_vside(
@@ -25,9 +24,9 @@ fn is_vside(
         (y3 - y1) / (x3 - x1) * (x2 - x1) + y1
     };
     if vside == VSide::Top {
-        return y >= y2;
+        y >= y2
     } else {
-        return y <= y2;
+        y <= y2
     }
 }
 
@@ -48,40 +47,35 @@ fn combine_ccw<T: PartialOrd+Copy>(top:Vec<T>,bottem:Vec<T>) -> Vec<T>{
             (false,_)   => break
         }
     }
-    return vec;
+    vec
 }
 
-    fn convex_hull_vside(vside: VSide, sorted_points: &[(f64, f64)]) -> Vec<(f64, f64)> {
-        let mut convex_hull: Vec<(f64, f64)> = Vec::new();
-        for point in sorted_points {
-            if convex_hull.len() < 2 {
-                convex_hull.push(*point);
-                continue;
-            }
-            let mut i = convex_hull.len() - 1;
-            while i > 0 {
-                if is_vside(vside, convex_hull[i - 1], convex_hull[i], *point) {
-                    convex_hull.pop();
-                } else {
-                    break;
-                }
-                i -= 1;
-            }
+fn convex_hull_vside(vside: VSide, sorted_points: &[(f64, f64)]) -> Vec<(f64, f64)> {
+    let mut convex_hull: Vec<(f64, f64)> = Vec::new();
+    for point in sorted_points {
+        if convex_hull.len() < 2 {
             convex_hull.push(*point);
+            continue;
         }
-        return convex_hull;
+        let mut i = convex_hull.len() - 1;
+        while i > 0 {
+            if is_vside(vside, convex_hull[i - 1], convex_hull[i], *point) {
+                convex_hull.pop();
+            } else {
+                break;
+            }
+            i -= 1;
+        }
+        convex_hull.push(*point);
     }
+    return convex_hull;
+}
 
 
-    pub fn graham_scan(mut points: Vec<(f64, f64)>) -> Vec<(f64, f64)> {
-        points.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Equal));
-        let convex_hull_top = convex_hull_vside(VSide::Top, &points);
-        let convex_hull_bottem = convex_hull_vside(VSide::Bottem, &points);
-        let convex_hull = combine_ccw(convex_hull_top, convex_hull_bottem);
-        //println!("All the points {:?}",points);
-        //println!("convex_hull_top: {:?}",convex_hull_top);
-        //println!("convex_hull_bottem: {:?}",convex_hull_bottem);
-        return convex_hull;
-        //println!("convex_hull: {:?}",convex_hull);
-    }
+pub fn graham_scan(mut points: Vec<(f64, f64)>) -> Vec<(f64, f64)> {
+    points.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Equal));
+    let convex_hull_top = convex_hull_vside(VSide::Top, &points);
+    let convex_hull_bottem = convex_hull_vside(VSide::Bottem, &points);
+    let convex_hull = combine_ccw(convex_hull_top, convex_hull_bottem);
+    return convex_hull;
 }

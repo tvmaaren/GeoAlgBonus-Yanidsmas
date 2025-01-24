@@ -2,7 +2,7 @@ use std::cmp::{min};
 use std::cmp::Ordering::Equal;
 //use partial_min_max::max;
 //mod graham_scan;
-use crate::graham_scan::graham_scan::graham_scan;
+use crate::graham_scan::graham_scan;
 
 fn norm ((x,y): (f64,f64)) -> f64 {
     f64::sqrt(x*x+y*y)
