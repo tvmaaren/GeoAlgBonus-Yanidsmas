@@ -1,6 +1,7 @@
 pub mod plot {
 
 use plotters::prelude::*;
+use std::cmp::min;
 
 fn point_bounds(points :&Vec<(f64,f64)>) -> (f64,f64,f64,f64){
     let mut first = true; 
@@ -31,6 +32,7 @@ const OUT_FILE_NAME: &str = "plotters-doc-data/normal-dist.png";
 pub fn plot(points: Vec<(f64,f64)>,convex_hull: Vec<(f64,f64)>) -> Result<(), Box<dyn std::error::Error>> {
     let root = BitMapBackend::new(OUT_FILE_NAME, (1024, 768)).into_drawing_area();
 
+    let point_size = min(10,100/f64::sqrt(points.len() as f64) as i32 );//max(10,1000/(f64::sqrt(points.len() as f64 ) as i64));
     let aspect_ratio = 768.0/1024.0;
     let (x_min,x_max,y_min,y_max) = point_bounds(&points);
     let x_middle = (x_min + x_max)/2.0;
@@ -60,12 +62,12 @@ pub fn plot(points: Vec<(f64,f64)>,convex_hull: Vec<(f64,f64)>) -> Result<(), Bo
     scatter_ctx.draw_series(
         points
             .iter()
-            .map(|(x, y)| Circle::new((*x, *y), 10, BLUE.filled())),
+            .map(|(x, y)| Circle::new((*x, *y), point_size , BLUE.filled())),
     )?;
     scatter_ctx.draw_series(
         convex_hull
             .iter()
-            .map(|(x, y)| Circle::new((*x, *y), 10, RED.filled())),
+            .map(|(x, y)| Circle::new((*x, *y), point_size, RED.filled())),
     )?;
 
     // To avoid the IO failure being ignored silently, we manually call the present function
