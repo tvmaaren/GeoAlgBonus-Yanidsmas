@@ -1,5 +1,7 @@
 mod graham_scan;
-use crate::graham_scan::graham_scan::graham_scan;
+use crate::graham_scan::graham_scan;
+mod jarvis_march;
+use crate::jarvis_march::jarvis_march;
 mod divide_and_conquer;
 use crate::divide_and_conquer::divide_and_conquer;
 mod plot;
@@ -56,6 +58,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let algorithm = match algorithm_name.as_str() {
         "graham_scan" => graham_scan,
         "divide_and_conquer" => divide_and_conquer,
+        "jarvis_march" => jarvis_march,
         &_ => todo!(),
     };
     //TODO: remove clone
