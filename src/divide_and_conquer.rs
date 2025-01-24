@@ -23,9 +23,12 @@ fn distance_sq(a: (f64, f64), b: (f64, f64)) -> f64 {
 }
 
 // Takes two vectors that are clockwise sorted convex hulls and returns the indices of the points that define their left tangent line.
-fn find_left_tangent(a: &[(f64, f64)], b: &[(f64, f64)]) -> (usize, usize) {
-    let mut current_a = 0;
-    let mut current_b = 0;
+fn find_left_tangent(
+    a: &[(f64, f64)],
+    b: &[(f64, f64)],
+    mut current_a: usize,
+    mut current_b: usize,
+) -> (usize, usize) {
     let len_a = a.len();
     let len_b = b.len();
     loop {
@@ -79,17 +82,22 @@ fn find_left_tangent(a: &[(f64, f64)], b: &[(f64, f64)]) -> (usize, usize) {
 }
 
 // Takes two vectors that are clockwise sorted convex hulls and returns the merged clockwise sorted convex hull.
-fn conquer(a: &[(f64, f64)], b: &[(f64, f64)]) -> Vec<(f64, f64)> {
-    let (a1, b1) = find_left_tangent(a, b);
-    let (b2, a2) = find_left_tangent(b, a);
+fn conquer(
+    a: &[(f64, f64)],
+    b: &[(f64, f64)],
+    max_a: usize,
+    max_b: usize,
+) -> (Vec<(f64, f64)>, usize) {
+    let (a1, b1) = find_left_tangent(a, b, max_a, 0);
+    let (b2, a2) = find_left_tangent(b, a, 0, max_a);
     let mut merged_hull = Vec::with_capacity(a.len() + b.len());
-    let mut avalue = a2;
+    let mut avalue = 0;
     loop {
         merged_hull.push(a[avalue]);
         if avalue == a1 {
             break;
         }
-        avalue = next_index(a.len(), avalue);
+        avalue += 1;
     }
     let mut bvalue = b1;
     loop {
@@ -99,20 +107,31 @@ fn conquer(a: &[(f64, f64)], b: &[(f64, f64)]) -> Vec<(f64, f64)> {
         }
         bvalue = next_index(b.len(), bvalue);
     }
-    merged_hull
+    avalue = a2;
+    loop {
+        if a2 == 0 {
+            break;
+        }
+        merged_hull.push(a[avalue]);
+        if avalue == a.len() - 1 {
+            break;
+        }
+        avalue += 1;
+    }
+    (merged_hull, (a1 + 1 + max_b - b1))
 }
-fn divide(sorted_points: &[(f64, f64)]) -> Vec<(f64, f64)> {
+fn divide(sorted_points: &[(f64, f64)]) -> (Vec<(f64, f64)>, usize) {
     let n = sorted_points.len();
     if n == 1 {
-        return vec![sorted_points[0]];
+        return (vec![sorted_points[0]], 0);
     }
     let mid = n / 2;
-    let left_hull = divide(&sorted_points[..mid]);
-    let right_hull = divide(&sorted_points[mid..]);
-    conquer(&left_hull, &right_hull)
+    let (left_hull, max_a) = divide(&sorted_points[..mid]);
+    let (right_hull, max_b) = divide(&sorted_points[mid..]);
+    conquer(&left_hull, &right_hull, max_a, max_b)
 }
 
 pub fn divide_and_conquer(mut points: Vec<(f64, f64)>) -> Vec<(f64, f64)> {
     points.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Equal));
-    divide(&points)
+    divide(&points).0
 }

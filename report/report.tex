@@ -17,7 +17,7 @@
 
 
 \title{Report on \href{https://github.com/tvmaaren/GeoAlgBonus-Yanidsmas}{Yanidsmas}}
-\author{Yanna \todo{surname} (\todo{student number}), Ids de Vlas (\todo{student number}), Thomas van Maaren (9825827)}
+\author{Yanna \todo{surname} (\todo{student number}), Ids de Vlas (6967396), Thomas van Maaren (9825827)}
 
 
 \begin{document}
@@ -85,6 +85,19 @@ intermediate set.
 
 \subsection*{Jarvis March}
 \subsection*{Divide and Conquer}
+The algorithm is a classic divide and conquer algorithm in the sense that the (sorted) imput is split into 2 parts, both of those are once again split recursively until only single points are left.
+The algorithm then computes the convex hull of the single point sets, and recursively merges the sets again maintaining a correct convex hull of the subset after every merge.
+The merging is done by first finding the upper and lower combined tangent of the two convex hulls to be merged.
+When considering the combined shape of the two convex hulls with the two tangents, any point on the interior of this shape is removed to create the combined convex hull.
+\\
+Most of the logic is in finding the upper and lower tangents for the merging process.
+Let $A$ and $B$ be two convex polygons representing two subset convex hulls to be merged. Every point in $B$ is right of every point in $A$ due to the dividing of the points.
+The tangent is then found by starting at a vertex pair $a \in A$ and $b \in B$, where the initial $a$ is the rightmost point of $A$ and the initial $b$ the leftmost of $B$. 
+Then the candidate tangent $\overline{ab}$ is created.
+If both the neighbours of both $a$ and $b$ are to the right of $\overline{ab}$, this candidate is the tangent we were looking for. 
+If one of the neighbours of $a$ is on the wrong side, $a$ is updated to be the next vertex of $A$, repeating this process while walking around the polygon. 
+The same is done for $b$.
+Colinearity is handled by picking the longest possible line segment as the tangent.
 \subsection*{Chan's Algorithm}
 
 \section*{Test cases}
