@@ -1,9 +1,8 @@
 use std::cmp::Ordering::Equal;
-static EPSILON: f64 = 1e-9;
 
 // Takes a vector and an index and returns the previous value of the index in the vector
-fn previous_index(v: &[(f64, f64)], i: usize) -> usize {
-    let l: usize = v.len();
+fn previous_index(len: usize, i: usize) -> usize {
+    let l: usize = len;
     if i == 0 {
         return l - 1;
     }
@@ -11,8 +10,8 @@ fn previous_index(v: &[(f64, f64)], i: usize) -> usize {
 }
 
 // Same but for the next one
-fn next_index(v: &[(f64, f64)], i: usize) -> usize {
-    (i + 1) % v.len()
+fn next_index(len: usize, i: usize) -> usize {
+    (i + 1) % len
 }
 
 // Used for checking if a point is right of a line
@@ -27,16 +26,17 @@ fn distance_sq(a: (f64, f64), b: (f64, f64)) -> f64 {
 fn find_left_tangent(a: &[(f64, f64)], b: &[(f64, f64)]) -> (usize, usize) {
     let mut current_a = 0;
     let mut current_b = 0;
-    let mut looking = true;
-    while looking {
-        let next_a = next_index(a, current_a);
-        let previous_a = previous_index(a, current_a);
+    let len_a = a.len();
+    let len_b = b.len();
+    loop {
+        let next_a = next_index(len_a, current_a);
+        let previous_a = previous_index(len_a, current_a);
 
         let cross_next_a = cross_product(a[current_a], b[current_b], a[next_a]);
         let cross_previous_a = cross_product(a[current_a], b[current_b], a[previous_a]);
 
         // Handle colinearity for a
-        if cross_previous_a.abs() < EPSILON
+        if cross_previous_a.abs() < f64::EPSILON
             && distance_sq(a[current_a], b[current_b]) < distance_sq(a[previous_a], b[current_b])
         {
             current_a = previous_a;
@@ -51,14 +51,14 @@ fn find_left_tangent(a: &[(f64, f64)], b: &[(f64, f64)]) -> (usize, usize) {
             continue;
         }
 
-        let next_b = next_index(b, current_b);
-        let previous_b = previous_index(b, current_b);
+        let next_b = next_index(len_b, current_b);
+        let previous_b = previous_index(len_b, current_b);
 
         let cross_next_b = cross_product(a[current_a], b[current_b], b[next_b]);
         let cross_previous_b = cross_product(a[current_a], b[current_b], b[previous_b]);
 
         // Handle colinearity for b
-        if cross_next_b.abs() < EPSILON
+        if cross_next_b.abs() < f64::EPSILON
             && distance_sq(a[current_a], b[current_b]) < distance_sq(a[current_a], b[next_b])
         {
             current_b = next_b;
@@ -73,23 +73,23 @@ fn find_left_tangent(a: &[(f64, f64)], b: &[(f64, f64)]) -> (usize, usize) {
             current_b = next_b;
             continue;
         }
-        looking = false;
+        break;
     }
     (current_a, current_b)
 }
 
 // Takes two vectors that are clockwise sorted convex hulls and returns the merged clockwise sorted convex hull.
-fn conquer(a: Vec<(f64, f64)>, b: Vec<(f64, f64)>) -> Vec<(f64, f64)> {
-    let (a1, b1) = find_left_tangent(&a, &b);
-    let (b2, a2) = find_left_tangent(&b, &a);
-    let mut merged_hull = Vec::new();
+fn conquer(a: &[(f64, f64)], b: &[(f64, f64)]) -> Vec<(f64, f64)> {
+    let (a1, b1) = find_left_tangent(a, b);
+    let (b2, a2) = find_left_tangent(b, a);
+    let mut merged_hull = Vec::with_capacity(a.len() + b.len());
     let mut avalue = a2;
     loop {
         merged_hull.push(a[avalue]);
         if avalue == a1 {
             break;
         }
-        avalue = next_index(&a, avalue);
+        avalue = next_index(a.len(), avalue);
     }
     let mut bvalue = b1;
     loop {
@@ -97,23 +97,22 @@ fn conquer(a: Vec<(f64, f64)>, b: Vec<(f64, f64)>) -> Vec<(f64, f64)> {
         if bvalue == b2 {
             break;
         }
-        bvalue = next_index(&b, bvalue);
+        bvalue = next_index(b.len(), bvalue);
     }
     merged_hull
 }
-
-//Takes the subarray from start to end, splits it up and merges it again
-fn divide(sorted_points: &[(f64, f64)], start: usize, end: usize) -> Vec<(f64, f64)> {
-    if end - start == 1 {
-        return vec![sorted_points[start]];
+fn divide(sorted_points: &[(f64, f64)]) -> Vec<(f64, f64)> {
+    let n = sorted_points.len();
+    if n == 1 {
+        return vec![sorted_points[0]];
     }
-    let m: usize = (start + end) / 2;
-    let a: Vec<(f64, f64)> = divide(sorted_points, start, m);
-    let b: Vec<(f64, f64)> = divide(sorted_points, m, end);
-    conquer(a, b)
+    let mid = n / 2;
+    let left_hull = divide(&sorted_points[..mid]);
+    let right_hull = divide(&sorted_points[mid..]);
+    conquer(&left_hull, &right_hull)
 }
 
 pub fn divide_and_conquer(mut points: Vec<(f64, f64)>) -> Vec<(f64, f64)> {
     points.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Equal));
-    divide(&points, 0, points.len())
+    divide(&points)
 }
