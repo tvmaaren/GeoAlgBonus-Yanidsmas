@@ -62,7 +62,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "graham_scan" => graham_scan,
         "divide_and_conquer" => divide_and_conquer,
         "chan" => chan,
-        :q
         "jarvis_march" => jarvis_march,
         &_ => todo!(),
     };

@@ -22,15 +22,9 @@ enum Change {
     Decrease,
 }
 
-fn min_bs(convex_vertices: &Vec<(f64,f64)>, p: (f64,f64), prev_p: (f64,f64)) -> Option<(f64,f64)> {
-    if convex_vertices.len() == 0 {
-        return None ;
-    }
+fn min_bs(convex_vertices: &Vec<(f64,f64)>, p: (f64,f64), prev_p: (f64,f64)) -> (f64,f64) {
     if convex_vertices.len() == 1 {
-        if convex_vertices[0] == p {
-            return None ;
-        }
-        return Some(convex_vertices[0]);
+        return convex_vertices[0];
     }
     
     let cos_angle_dist = |q| (cos_angle(prev_p,p,q),-dist(q,p));
@@ -43,8 +37,10 @@ fn min_bs(convex_vertices: &Vec<(f64,f64)>, p: (f64,f64), prev_p: (f64,f64)) -> 
     let mut l = 0;
     let n = convex_vertices.len();
     let mut r = n;
-    while l+1<r{
-        let m = (l+r)/2;
+    while l+1<r && (convex_vertices[(l+1)%n]!=p || l+2 <r) {
+        println!("lr: {} {}",l,r);
+        let m_= (l+r)/2;
+        let m = if convex_vertices[m_]==p {if (l+r)%2==0 {m_-1} else {m_+1} } else {(l+r)/2};
         let m_change = if cos_angle_dist(convex_vertices[m])<cos_angle_dist(convex_vertices[(m+1)%n]) {
                             Change::Increase
                         }else {
@@ -64,16 +60,18 @@ fn min_bs(convex_vertices: &Vec<(f64,f64)>, p: (f64,f64), prev_p: (f64,f64)) -> 
             
         };
     }
-    let i = if cos_angle_dist(convex_vertices[l])<cos_angle_dist(convex_vertices[(l+1)%n]) {l} else {(l+1)%n};
-    if convex_vertices[i]==p {Some(convex_vertices[(i+1)%n])} else {Some(convex_vertices[i])}
+    convex_vertices[l]
 }
 
 fn chan_m(points : Vec<(f64,f64)>, m : i64) -> Option<Vec<(f64,f64)>> {
     //partition P into subsets P1 . . . . . Prn/m] each of size at most m
+    println!("chan_m");
     let mut i =0;
     let mut partition = Vec::new();
     for point in &points {
+        println!("element {}", i);
         if i%m==0 {
+            println!("new partition");
             partition.push(Vec::new());
         }
         partition[(i/m) as usize ].push(*point);
@@ -99,15 +97,12 @@ fn chan_m(points : Vec<(f64,f64)>, m : i64) -> Option<Vec<(f64,f64)>> {
             let p = convex_hull[(k-1) as usize];
             let cos_angle_dist = |q| (cos_angle(prev_p,p,q),-dist(q,p));
             //let Some(q_i) = partition_convex_hull.iter().filter(|a| **a!=p).min_by(|a,b| (cos_angle_dist(**a).partial_cmp(&cos_angle_dist(**b)).unwrap_or(Equal))) else {continue;};
-            match min_bs(partition_convex_hull,p,prev_p) {
-                Some(q_i) =>{
-                            let q_i_cos_angle_dist = cos_angle_dist(q_i);
-                            if q_i_cos_angle_dist< min_cos_angle_dist {
-                                min_cos_angle_dist = q_i_cos_angle_dist;
-                                new_p = Some(q_i);
-                            }
-                            }
-                _         =>{}
+            println!("before min_bs");
+            let q_i = min_bs(partition_convex_hull,p,prev_p);
+            let q_i_cos_angle_dist = cos_angle_dist(q_i);
+            if q_i_cos_angle_dist< min_cos_angle_dist {
+                min_cos_angle_dist = q_i_cos_angle_dist;
+                new_p = Some(q_i);
             }
         }
         if new_p==Some(convex_hull[0]) {
@@ -122,8 +117,7 @@ fn chan_m(points : Vec<(f64,f64)>, m : i64) -> Option<Vec<(f64,f64)>> {
 pub fn chan(points : Vec<(f64,f64)>) -> Vec<(f64,f64)> {
     let mut t=1;
     loop{
-        let m = min(2_i64.pow(2_u32.pow(t)),points.len() as i64);
-        println!("{} {} {}",m,2^(2^t),points.len());
+        let m = 7;//min(2^(2^t),points.len());
         match chan_m(points.clone(),m as i64) {
             Some(hull) => return hull,
             None => {}
