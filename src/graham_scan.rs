@@ -45,33 +45,22 @@ fn convex_hull_vside (vside : VSide, sorted_points : &[(f64,f64)]) -> Vec<(f64,f
 }
 
 //This function assumes that a and b have the same ordering.
-fn union_sorted<T: PartialOrd+Copy>(a:Vec<T>,b:Vec<T>) -> Vec<T>{
-    let mut vec = Vec::new();
-    let mut i = 0;
-    let mut j = 0;
+fn combine_ccw<T: PartialOrd+Copy>(top:Vec<T>,bottem:Vec<T>) -> Vec<T>{
+    let mut vec = bottem.clone();
+    let mut i = top.len();
+    let mut j = bottem.len();
     loop {
-        match (i<a.len(),j<b.len()) {
-            (true,true) => match a[i].partial_cmp(&b[j]) {
-                                Some(Equal)   => {vec.push(a[i]);
-                                                  i+=1;
-                                                  j+=1
-                                                 }
-                                Some(Less)    => {vec.push(a[i]);
-                                                  i+=1;
-                                                 }
-                                Some(Greater) => {vec.push(b[j]);
-                                                  j+=1;
-                                                 }
+        match (i>0,j>0) {
+            (true,true) => match top[i-1].partial_cmp(&bottem[j-1]) {
+                                Some(Equal)   => i-=1,
+                                Some(Less)    => j-=1,
+                                Some(Greater) => {vec.push(top[i-1]);i-=1;}
                                 None          => todo!()
                            }
-            (true,false)=> {vec.push(a[i]);
-                           i+=1;}
-            (false,true)=> {vec.push(b[i]);
-                           j+=1;}
-            (false,false)=>break,
+            (true,false)=> {vec.push(top[i-1]);i-=1;}
+            (false,_)   => break
         }
     }
-    vec.push(a[0]);
     return vec;
 }
 
@@ -81,7 +70,7 @@ pub fn graham_scan(mut points : Vec<(f64,f64)>) -> Vec<(f64,f64)> {
     points.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Equal));
     let convex_hull_top= convex_hull_vside(VSide::Top, &points);
     let convex_hull_bottem = convex_hull_vside(VSide::Bottem, &points);
-    let convex_hull = union_sorted(convex_hull_top,convex_hull_bottem);
+    let convex_hull = combine_ccw(convex_hull_top,convex_hull_bottem);
     //println!("All the points {:?}",points);
     //println!("convex_hull_top: {:?}",convex_hull_top);
     //println!("convex_hull_bottem: {:?}",convex_hull_bottem);

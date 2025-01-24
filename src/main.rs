@@ -1,3 +1,6 @@
+
+mod chan;
+use crate::chan::chan;
 mod graham_scan;
 use crate::graham_scan::graham_scan::graham_scan;
 mod plot;
@@ -51,6 +54,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let algorithm_name = &args[1];
     let algorithm = match algorithm_name.as_str() {
                           "graham_scan" => graham_scan,
+                          "chan" => chan,
                           &_ => todo!()
                     };
     //TODO: remove clone
@@ -59,3 +63,4 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     plot(points.clone(),convex_hull)?;
     Ok(())
 }
+
